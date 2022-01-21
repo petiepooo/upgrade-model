@@ -1,0 +1,1 @@
+sudo python3 ./LED_DMA.py -p allon -c 0xff0000 -n 1
