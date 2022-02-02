@@ -1,0 +1,5 @@
+gcc -fPIC -g -c -Wall  test_ctypes.c
+gcc -shared -Wl,-soname,test_ctypes.so -o test_ctypes.so   test_ctypes.o
+rm test_ctypes.o
+rm rpi_dma_utils.o
+

@@ -1,0 +1,4 @@
+git status
+git add --all
+git commit -am 'update programs'
+git push upstream  master

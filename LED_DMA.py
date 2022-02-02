@@ -72,7 +72,7 @@ parser.add_argument('-d', '--delay_iterations', metavar='\b',
 parser.add_argument('-p', '--pattern', metavar='\b',
                     default='allon',
                     dest='pattern',
-                    help ='select pattern data,datatime, wipe (c), wipe3, rainbowwipe, singlewipe (c), rainbow, allon (c), showstring (s,c), instrument (default: allon)')
+                    help ='select pattern data,datatime, wipe (c), wipe3, rainbowwipe, rainbowtheater, singlewipe (c), rainbow, allon (c), showstring (s,c), instrument (default: allon)')
 parser.add_argument('-c', '--color', metavar='\b',
                     default=0xff0000,
                     dest='color_string',
@@ -115,25 +115,27 @@ color_bits  = 8     # 8 bits for each colour
 #
 # ==================  model parameters ======================================================
 strings     = 16    # maximal number of strings (16 allowed)
-LEDs        = 96    # maximal numbers of LED's per strip
+LEDs        = 95    # maximal numbers of LED's per strip
 # ============================================================================================
 #
 # ==================  initialize =============================================================
-wipe=False;wipe3=False;singlewipe=False;rainbowwipe=False;rainbow=False;showstring=False;allon=False;instrument=False;data=False;datatime=False
-slices=96           # default number of time slices
+wipe=False;wipe3=False;singlewipe=False;rainbowwipe=False;rainbowtheater=False;rainbow=False
+showstring=False;allon=False;instrument=False;data=False;datatime=False
+slices=95           # default number of time slices
 # ============================================================================================
 #
 # =================== settings according to pattern ==========================================
-if     parsed.pattern == 'wipe':        wipe         = True
-elif   parsed.pattern == 'wipe3':       wipe3        = True; slices=96*3
-elif   parsed.pattern == 'rainbowwipe': rainbowwipe  = True;
-elif   parsed.pattern == 'rainbow':     rainbow      = True; slices=1
-elif   parsed.pattern == 'singlewipe':  singlewipe   = True; slices=96*16
-elif   parsed.pattern == 'showstring':  showstring   = True; slices=1
-elif   parsed.pattern == 'allon':       allon        = True; slices=1
-elif   parsed.pattern == 'instrument':  instrument   = True; slices=1
-elif   parsed.pattern == 'datatime':    datatime     = True; slices=360
-elif   parsed.pattern == 'data':        data         = True; slices=1
+if     parsed.pattern == 'wipe':           wipe            = True
+elif   parsed.pattern == 'wipe3':          wipe3           = True; slices=LEDs*colors
+elif   parsed.pattern == 'rainbowwipe':    rainbowwipe     = True;
+elif   parsed.pattern == 'rainbowtheater': rainbowtheater  = True;
+elif   parsed.pattern == 'rainbow':        rainbow         = True; slices=1
+elif   parsed.pattern == 'singlewipe':     singlewipe      = True; slices=LEDs*strings
+elif   parsed.pattern == 'showstring':     showstring      = True; slices=1
+elif   parsed.pattern == 'allon':          allon           = True; slices=1
+elif   parsed.pattern == 'instrument':     instrument      = True; slices=1
+elif   parsed.pattern == 'datatime':       datatime        = True; slices=360
+elif   parsed.pattern == 'data':           data            = True; slices=1
 else:                                  print("option not available")
 # ===========================================================================================
 
@@ -142,21 +144,22 @@ largearray = np.zeros((slices,LEDs,strings,colors), dtype=np.uint8)  # three 8 b
 # ===========================================================================================
 # print("largearray=",largearray)
 # ================== call pattern producing programs ========================================
-if wipe:          largearray=ldu.Wipe(largearray,color,parsed.brightness)
-elif wipe3:       largearray=ldu.Wipe3(largearray,parsed.brightness)
-elif rainbowwipe: largearray=ldu.RainbowWipe(largearray,parsed.brightness)
-elif rainbow:     largearray=ldu.Rainbow(largearray,parsed.brightness)
-elif singlewipe:  largearray=ldu.ColorSingleWipe(largearray,color,parsed.brightness)
-elif instrument:  largearray=ldu.Instrument(largearray,parsed.type,parsed.brightness)
-elif showstring:  largearray=ldu.ShowString(largearray,parsed.string_id,color,parsed.brightness)
-elif allon:       largearray=ldu.AllOn(largearray,color,parsed.brightness)
+if wipe:             largearray=ldu.Wipe(largearray,color,parsed.brightness)
+elif wipe3:          largearray=ldu.Wipe3(largearray,parsed.brightness)
+elif rainbowwipe:    largearray=ldu.RainbowWipe(largearray,parsed.brightness)
+elif rainbowtheater: largearray=ldu.RainbowTheater(largearray,parsed.brightness)
+elif rainbow:        largearray=ldu.Rainbow(largearray,parsed.brightness)
+elif singlewipe:     largearray=ldu.ColorSingleWipe(largearray,color,parsed.brightness)
+elif instrument:     largearray=ldu.Instrument(largearray,parsed.type,parsed.brightness)
+elif showstring:     largearray=ldu.ShowString(largearray,parsed.string_id,color,parsed.brightness)
+elif allon:          largearray=ldu.AllOn(largearray,color,parsed.brightness)
 elif data or datatime:
     start= 10000    # simulation is given in window; select central part to suppress noise
     stop = 15000
     #time_index = ldu.time_slice_index(start,stop,testdata)
     #
     # --------   fill large array in predefined time bins with color code -------------------
-    # physics region model shows DOMs 11-60 (DeepCore) and DOMs 32 to 126 (upgrade)
+    # physics region model shows DOMs 11-60 (DeepCore) and DOMs 32 to 125 (upgrade)
     # reorder, so we start with lowest DOM in each string
     #
     ldu.turn_HDMI_off()
@@ -172,11 +175,12 @@ elif data or datatime:
         string_id = tempfile[k,0]
         DOM_id    = tempfile[k,1]
         pulse_time= tempfile[k,2]
-        if pulse_time < start or pulse_time > stop: continue   # important!
-        elif string_id < 87 and DOM_id < 11:   continue        # DeepCore: take only physics region!
-        elif string_id < 87 and DOM_id > 60:   continue
-        elif string_id > 86 and DOM_id < 33:   continue        # phase 1
-        elif string_id > 86 and DOM_id > 126:  continue
+        if pulse_time < start or pulse_time > stop: continue        # important!
+        elif string_id < 87 and DOM_id < 11:        continue        # DeepCore: take only physics region!
+        elif string_id < 87 and DOM_id > 60:        continue        # DeepCore
+        elif string_id > 86 and DOM_id < 33:        continue        # phase 1
+        elif (string_id >  90 or string_id == 89)                    and DOM_id > 120:  continue
+        elif (string_id == 87 or string_id == 88 or string_id == 90) and DOM_id > 125:  continue   # 87 88 90 are longer
         #print(time_index[k],string_id,DOM_id)
         #largearray[time_index[k],ldu.DOM_index(string_id,DOM_id),ldu.string_index(string_id)]=ldu.SineLED(time_index[k],parsed.brightness)
         if data:     largearray[0,ldu.DOM_index(string_id,DOM_id),ldu.string_index(string_id)]=ldu.SineLED(time_index[k],parsed.brightness)

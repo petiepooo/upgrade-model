@@ -1,0 +1,41 @@
+test_string                shell script to run standard Python interface on GPIO18 with hardware PWA
+
+LED_DMA.c                  c program for SMI DMA access, accepts array
+rpi                        directory that hosts utility program for DMA SMI access
+compile_LED_DMA            shell script to make shared library from test_LED_DMA.c
+
+compile_test_ctypes        shell script to make shared library from test_ctypes.c
+test_ctypes.c              c program connected to test_ctypes.py
+test_ctypes.py             python script to test c program access via ctypes 
+test_ctypes                shell script to run test_ctypes.py with python3
+
+
+turning on/off video:
+vcgencmd display_power 0   # off
+vcgencmd display_power 1   # on
+
+or
+
+tvservice --off        or -o
+tvservice --preferred  or -p    (but then screen is empty)
+
+the latter disables the whole display pipeline, inclduing clocks ...
+https://www.elektronik-kompendium.de/sites/raspberry-pi/2111101.htm
+/opt/vc/bin/tvservice -p; sudo /bin/chvt 6; sudo /bin/chvt 7 (gui)
+/opt/vc/bin/tvservice -p; sudo /bin/chvt 2; sudo /bin/chvt 1 (console)
+
+https://tutorials-raspberrypi.de/raspberry-pi-ws2812-ws2811b-rgb-led-streifen-steuern/
+provides instructions on how to install the rpi_ws281x software:
+
+sudo apt-get update
+sudo apt-get install gcc make build-essential python-dev git scons swig
+sudo nano /etc/modprobe.d/snd-blacklist.conf   enter: blacklist snd_bcm2835    (in order to disable audio)
+sudo nano /boot/config.txt : # Enable audio (loads snd_bcm2835)  #dtparam=audio=on (comment out)
+sudo reboot
+git clone https://github.com/jgarff/rpi_ws281x
+cd rpi_ws281x/  : sudo scons     compile everything
+sudo python3 setup.py build
+sudo python3 setup.py install
+sudo pip3 install adafruit-circuitpython-neopixel
+
+

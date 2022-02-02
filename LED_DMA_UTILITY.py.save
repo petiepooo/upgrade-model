@@ -1,6 +1,5 @@
 import numpy as np
-import subprocess
-lights=[ 0, 0, 0, 0, 0, 1, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 17, 18, 20,
+lights=[  0,   0,   0,   0,   0,   1,   1,   2,   2,   3,   4,   5,   6,   7,   8,   9,  11,  12,  13,  15,  17,  18,  20,
          22,  24,  26,  28,  30,  32,  35,  37,  39,  42,  44,  47,  49,  52,  55,  58,  60,  63,  66,  69,  72,  75,  78,
          81,  85,  88,  91,  94,  97, 101, 104, 107, 111, 114, 117, 121, 124, 127, 131, 134, 137, 141, 144, 147, 150, 154,
         157, 160, 163, 167, 170, 173, 176, 179, 182, 185, 188, 191, 194, 197, 200, 202, 205, 208, 210, 213, 215, 217,
@@ -18,14 +17,14 @@ lights=[ 0, 0, 0, 0, 0, 1, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 17, 18,
           0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
           0,   0,   0,   0,   0]
 
-def fillarray(A,slices=0,LEDs=95,strings=16,color_bits=8):
+def fillarray(A,slices=0,strings=16,LEDs=60,colour_bits=8):
     # routine to fill bit filled vector H
     #
     # input:
     #
     # A index 0: timeslice
-    # A index 1: DOM
-    # A index 2: string
+    # A index 1: string
+    # A index 2: DOM
     # A value:   BGR (blue green red)
     #
     # output:
@@ -62,156 +61,81 @@ def fillarray(A,slices=0,LEDs=95,strings=16,color_bits=8):
     # The handling of the pre- and postbits is done in the c code by the definition of the buffer pointers.
     # The switch to the next time slice is handled by a sleep command in the c code.
     #
-    #print("slices=",slices,"LEDs=",LEDs,"strings=",strings,"color_bits=",color_bits)
-    #
-    # example color = 0x110000
-    # temp_red= [[[[0 0 0 0 0 0 1 1]    8 color bits for 16 strings
-    #              [0 0 0 0 0 0 1 1]
-    #              [0 0 0 0 0 0 1 1]
-    #  ...
-    #              [0 0 0 0 0 0 1 1]
-    #              [0 0 0 0 0 0 1 1]
-    #              [0 0 0 ... 0 1 1]]
-    # repeats for each LED
-    # repeats for each slice
-    #
-    temp_red   = np.unpackbits(A[:,:,:,0]).reshape(slices,LEDs,strings,color_bits)   # reshape, color bit 7 first
-    temp_green = np.unpackbits(A[:,:,:,1]).reshape(slices,LEDs,strings,color_bits)   # reshape, color bit 7 first
-    temp_blue  = np.unpackbits(A[:,:,:,2]).reshape(slices,LEDs,strings,color_bits)   # reshape, color bit 7 first
-    #print("original blue=",A[:,:,:,2])
-    #print("bits=",temp_blue)
-    #
-    # Ered= [[    0     0     0     0     0     0 65535 65535]      #  LEDs x   8 color bits 16 bit word (1 bit per string)
-    #        [    0     0     0     0     0     0 65535 65535]
-    #        .....
-    #        [    0     0     0     0     0     0 65535 65535]]
-    #
-    Tgreen = np.ndarray.transpose(temp_green,(0,1,3,2)).reshape(slices,LEDs,color_bits,2,8)[:,:,:,:,::-1]    # packing works only with 8 bits
-    Tred   = np.ndarray.transpose(temp_red,  (0,1,3,2)).reshape(slices,LEDs,color_bits,2,8)[:,:,:,:,::-1]    # reorder so that string 0 is lowest bit
-    Tblue  = np.ndarray.transpose(temp_blue, (0,1,3,2)).reshape(slices,LEDs,color_bits,2,8)[:,:,:,:,::-1]
-    Egreen = np.packbits(Tgreen).view(np.uint16).reshape(slices,LEDs,color_bits) # rearange green bins by string
-    Ered   = np.packbits(Tred).view(np.uint16).reshape(slices,LEDs,color_bits) # rearange red bins by string
-    Eblue  = np.packbits(Tblue).view(np.uint16).reshape(slices,LEDs,color_bits) # rearange blue bins by string
-    # now, for each LED, put green first, then red, then blue
-    # print("transposed=",Tblue)
-    # print("Eblue=",Eblue)
-
-    Ecolor=np.block([Egreen,Ered,Eblue]).flatten()
-    # now interweave 65535  (16 bits set) and 0 with each color bit
-    in_ones   = range(0,len(Ecolor),1)                             # position to fill ones before color bitpattern
-    temp      = np.insert(Ecolor,in_ones,65535)                    # fill in ones for # of strings
+    temp_green = np.unpackbits(A[:,:,:,0]).reshape(slices,LEDs,strings,colour_bits)  # starts with highest bin
+    temp_red   = np.unpackbits(A[:,:,:,1]).reshape(slices,LEDs,strings,colour_bits)  # starts with highest bin
+    temp_blue  = np.unpackbits(A[:,:,:,2]).reshape(slices,LEDs,strings,colour_bits)  # starts with highest bin
+    Egreen = np.packbits(np.ndarray.transpose(temp_green,(0,1,3,2))).view(np.uint16) # rearange green bins by string
+    Ered   = np.packbits(np.ndarray.transpose(temp_red,(0,1,3,2))).view(np.uint16)   # rearange red bins by string
+    Eblue  = np.packbits(np.ndarray.transpose(temp_blue,(0,1,3,2))).view(np.uint16)  # rearange blue bins by string
+    Ecolour= np.concatenate((Egreen,Ered,Eblue), axis=None)        # concatenate all colors
+    in_ones   = range(0,len(Ecolour),1)                            # position to fill ones before color bitpattern
+    temp=np.insert(Ecolour,in_ones,65535)                          # fill in ones for # of strings
     in_zeros  = range(2,len(temp)+1,2)                             # position to fill zeros after color bitpattern
-    full      = np.insert(temp,in_zeros,0)                         # fill in zeros for # of strings
-    return full
+    return np.insert(temp,in_zeros,0)                              # fill in zeros for # of strings
 
-def index_flat(rows,columns,indexlist):
-    ind_matrix = np.arange(0, rows*columns).reshape(rows, columns)
-    temp_index=indexlist.T.tolist()
-    return ind_matrix[tuple(temp_index)]   # produce flat index array
 
-def Split24(input,brightness):
-    temp,blue = divmod(input,256)
-    red,green = divmod(temp, 256)
-    #print("input=",input)
-    #print(red,green,blue)
-    return (int(round(red*brightness,0)),int(round(green*brightness,0)),int(round(blue*brightness,0)))   # splits 24 bit rgb color into three single 8 bit colors red, green, blue
-
-def SineLED(angle,brightness):
-    return (int(round(lights[(angle+120)%360]*brightness,0)),int(round(lights[angle]*brightness,0)), int(round(lights[(angle+240)%360]*brightness,0))) # return color triple
+def SineLED(angle):
+    return ([lights[(angle+120)%360],lights[angle], lights[(angle+240)%360]]) # return color triple
 
 def time_slice_index(start,stop,data_array):
     duration=(stop-start)
     index = np.rint(359*(data_array[:,2]-start)/(stop-start)).astype(int)
-    #return index[(data_array[:,2] > start) & (data_array[:,2] < stop)] 
-    return index #result only makes sense for times between start and stop; however, we cut later on this ... 
+    return index
 
 def string_index(string_id):
     # routine to calculate index in largearray for a given string number
     # start with DeepCore string as index 0
     # also use this routine to correct for cabeling and assignment to Raspberry Pi pins
-    # assign_string=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14] # here define electronics mess
-    assign_string=[12,13,5,14,4,11,10,2,9,6,1,8,0,3,7] # here define electronics mess
+    assign_string=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14] # here define electronics mess
     return assign_string[string_id-79]   # start with index 0 and assign to correct rpi channel
 
 def DOM_index(string_id,DOM_id):
     if   string_id < 87: return 59  - (DOM_id-11)    # 0 to 59 starting with lowest DOM 60 to DOM 11
-    elif string_id > 86: return 94  - (DOM_id-32)    # 0 to 94 starting with lowest DOM 95 to DOM 32
+    elif string_id > 86: return 95  - (DOM_id-32)    # 0 to 95 starting with lowest DOM 96 to DOM 32
 
-def turn_HDMI_on():
-    subprocess.call("sh ./monitor_on.sh",shell=True)
 
-def turn_HDMI_off():
-    subprocess.call("sh ./monitor_off.sh",shell=True)
-
-def Wipe3(arr,brightness):
-    # dimension of arr: slices x LEDs x strings = 95*3x95x16x3 !
-    # turns on 1 LED more with one of three basic color for increasing timeslices (same for all strings)
-    col=[0xff0000,0x00ff00,0x0000ff]
-    temp=np.zeros((arr.shape[1],arr.shape[2],arr.shape[3]), dtype=np.uint8)
-    for i in range(3):
-        for k in range(arr.shape[1]):
-            temp[k,:,:]=Split24(col[i])
-            arr[k+i*arr.shape[1]]=temp
-    return arr
-
-def Wipe(arr,color,brightness):
-    # dimension of arr: slices x LEDs x strings = 95x95x16x3 !
+def Wipe(arr,color):
+    # dimension of arr: 96*3x16x96 !
     # turns on 1 LED more with chosen color for increasing timeslices (same for all strings)
-    temp=np.zeros((arr.shape[1],arr.shape[2],arr.shape[3]), dtype=np.uint8)
-    for k in range(arr.shape[1]):  # LEDs
-        temp[k,:,:] = Split24(color,brightness)
-        arr[k]      = temp
-    return arr
+    col=[0xff0000,0x00ff00,0x0000ff]
+    length=arr.shape[2]
+    for i in range(3):
+        for k in range(length):
+            arr[k+i*length,:,k]=col[i]
 
-def ColorSingleWipe(arr,color,brightness):
-    # dimension of arr: slices x LEDs x strings =  (95*16)x95x16x3 !
+def ColorWipe(arr,color):
+    # dimension of arr: 96*3x16x96 !
+    # turns on 1 LED more with chosen color for increasing timeslices (same for all strings)
+    length=arr.shape[2]
+    for k in range(length):
+        arr[k,:,k]=color
+
+def ColorSingleWipe(arr,color):
+    # dimension of arr: (96*16)x16x96 !
     # turns on 1 LED more with chosen color for increasing timeslices (string after string)
-    temp=np.zeros((arr.shape[1],arr.shape[2],arr.shape[3]),dtype=np.uint8)
-    for j in range(arr.shape[2]):         # strings
-        for k in range(arr.shape[1]):     # LEDs
-            temp[k,j,:]=Split24(color,brightness)
-            arr[k+j*arr.shape[1]]=temp
-    return arr
+    for j in range(arr.shape[1]):
+        for k in range(arr.shape[2]):
+            arr[k+j*arr.shape[2],j,k]=color
 
-def RainbowWipe(arr,brightness):
-    # dimension of arr: slices x LEDs x strings = 95x95x16x3 !
-    # similar as colorwipe, but changing colors (same for all strings)
-    temp=np.zeros((arr.shape[1],arr.shape[2],arr.shape[3]),dtype=np.uint8)
-    for k in range(arr.shape[1]):
-         temp[k,:,:]=SineLED(int(k*360/arr.shape[1]),brightness)
-         arr[k]=temp
-    return arr
+def RainbowWipe(arr):
+    # dimension of arr: 96x16x96 !
+    # similar as colorwipe, but changing colours (same for all strings)
+    for k in range(arr.shape[0]):
+        arr[k,:,k]=SineLED(int(k*360/arr.shape[0]))
 
-def Rainbow(arr,brightness):
-    # dimension of arr: slices x LEDs x strings = 1x95x16x3 !
-    # similar as allon, but changing colors (same for all strings)
-    for k in range(arr.shape[1]):
-         arr[:,k,:,:]=SineLED(int(k*360/arr.shape[1]),brightness)
-    return arr
+def ShowString(arr,string_id,color):
+    # dimension of arr: 1x16x96 !
+    # set all LEDs in chosen string with color
+    for k in range(arr.shape[2]):
+        arr[:,,k]=color
 
-def RainbowTheater(arr,brightness):
-    # dimension of arr: slices x LEDs x strings = 95x95x16x3 !
-    # similar to RainbowWipe, but  all colours moving
-    temp=np.zeros((arr.shape[1],arr.shape[2],arr.shape[3]),dtype=np.uint8)
-    for k in range(arr.shape[1]):
-         temp[k,:,:]=SineLED(int(k*360/arr.shape[1]),brightness)
-         arr[k] =  np.roll(temp,1,axis=0)  # for each slice move all colours by 1 (circular buffer)
-    return arr
+def AllOn(arr,color):
+    # dimension of arr: 1x16x96 !
+    # similar as colorwipe, but changing colours (same for all strings)
+    for k in range(arr.shape[2]):
+        arr[:,string_id,k]=color
 
-def ShowString(arr,string_id,color,brightness):
-    # dimension of arr: slices x LEDs x strings = 1x95x16x3 !
-    # sets all LEDs in particular string_id to color
-    #print(arr.shape)
-    arr[:,:,string_index(string_id),:]=Split24(color,brightness)
-    return arr
-
-def AllOn(arr,color,brightness):
-    # dimension of arr: slices x LEDs x strings = 1x95x16x3 !
-    # sets all strings to color
-    arr[:,:,:,:]=Split24(color,brightness)
-    return arr
-
-def Instrument(arr,type,brightness):
+def Instrument(arr,type):
     if    type == 'pDOM' :
         color=0xff0000   # red                (pDOM)
         ind=[[string_index(87),DOM_index(87,95)],
@@ -224,7 +148,7 @@ def Instrument(arr,type,brightness):
     elif  type == 'mDOM' : color=0x00ff00   # green              (mDOM)
     elif  type == 'DEgg' : color=0x0000ff   # blue               (DEgg)
     elif  type == 'WOM'  :
-        color=0xffff00    # yellow             (WOM)
+        color=0xfff00    # yellow             (WOM)
         ind=[[string_index(87),DOM_index(87,122)],
              [string_index(87),DOM_index(87,123)],
              [string_index(87),DOM_index(87,124)],
@@ -284,8 +208,4 @@ def Instrument(arr,type,brightness):
     #length=arr.shape[2]
     #for k in range(ind):
         #arr[0,ind[0],ind[1]]=color
-    #temp = ndarray.flatten
-    # return arr
-    #replace_index(arr,ind,Split24(color))
-    np.put(arr,index_flat(arr.shape[0],arr.shape[1],ind),color)  # check!!
-    return arr
+
