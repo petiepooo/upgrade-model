@@ -6,6 +6,7 @@ SLIDE_SHOW                 shell program to run various patterns and data displa
 rpi                        directory that hosts utility program for DMA SMI access
 data                       directory that holds json files with simulated data 
 compile_LED_DMA            shell script to make shared library from test_LED_DMA.c
+gitcommit                  program to run git from rpi to update master repository (note that you have to include an "add" for new programs )
 
 older programs: 
 test_string                shell script to run standard Python interface on GPIO18 with hardware PWA
