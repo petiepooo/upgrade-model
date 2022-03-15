@@ -7,7 +7,7 @@ delayevent=50
    #do
      #echo "Pres CTRL+C to stop..."
      #sleep 10
-     sudo python3 ./LED_DMA.py -p rainbowtheater -n 2 -b $brightness -d $delay
+     sudo python3 ./LED_DMA.py -p rainbowtheater -n 2 -b $brightness -d $delayevent
      sudo python3 ./LED_DMA.py -t DEgg -p instrument -n 2 -b $brightness -d $delay
      sudo python3 ./LED_DMA.py -t mDOM -p instrument -n 2 -b $brightness -d $delay
      sudo python3 ./LED_DMA.py -t pDOM -p instrument -n 2 -b $brightness -d $delay
@@ -23,6 +23,6 @@ delayevent=50
      sudo python3 ./LED_DMA.py -p datatime -d $delayevent -n 1 -b $brightness -i "data/NuMu95GeV.json"
      sudo python3 ./LED_DMA.py -p datatime -d $delayevent -n 1 -b $brightness -i "data/NuMu94GeV.json"
      sudo python3 ./LED_DMA.py -p datatime -d $delayevent -n 1 -b $brightness -i "data/NuMu196GeV.json"
-     sudo python3 ./LED_DMA.py -p rainbowtheater -n 2 -b $brightness -d $delay
+     sudo python3 ./LED_DMA.py -p rainbowtheater -n 2 -b $brightness -d $delayevent
    #done
 
