@@ -1,0 +1,28 @@
+#!/bin/bash
+brightness=0.5
+delay=100
+delayevent=50
+#
+#while true
+   #do
+     #echo "Pres CTRL+C to stop..."
+     #sleep 10
+     sudo python3 ./LED_DMA.py -p rainbowtheater -n 2 -b $brightness -d $delay
+     sudo python3 ./LED_DMA.py -t DEgg -p instrument -n 2 -b $brightness -d $delay
+     sudo python3 ./LED_DMA.py -t mDOM -p instrument -n 2 -b $brightness -d $delay
+     sudo python3 ./LED_DMA.py -t pDOM -p instrument -n 2 -b $brightness -d $delay
+     sudo python3 ./LED_DMA.py -t POCAM -p instrument -n 2 -b $brightness -d $delay
+     sudo python3 ./LED_DMA.py -t PB -p instrument -n 2 -b $brightness -d $delay
+     sudo python3 ./LED_DMA.py -t AM -p instrument -n 2 -b $brightness -d $delay
+     sudo python3 ./LED_DMA.py -t DMice -p instrument -n 2 -b $brightness -d $delay
+     sudo python3 ./LED_DMA.py -t WOM -p instrument -n 2 -b $brightness -d $delay
+     sudo python3 ./LED_DMA.py -p rainbowwipe -n 1 -b $brightness -d $delay
+     sudo python3 ./LED_DMA.py -p data -n 1 -b $brightness -d $delay -i "data/NuMu*GeV.json"
+     sudo python3 ./LED_DMA.py -p wipe3 -n 1 -b $brightness
+     sudo python3 ./LED_DMA.py -p datatime -d $delayevent -n 1 -b $brightness -i "data/NuMu180GeV.json"
+     sudo python3 ./LED_DMA.py -p datatime -d $delayevent -n 1 -b $brightness -i "data/NuMu95GeV.json"
+     sudo python3 ./LED_DMA.py -p datatime -d $delayevent -n 1 -b $brightness -i "data/NuMu94GeV.json"
+     sudo python3 ./LED_DMA.py -p datatime -d $delayevent -n 1 -b $brightness -i "data/NuMu196GeV.json"
+     sudo python3 ./LED_DMA.py -p rainbowtheater -n 2 -b $brightness -d $delay
+   #done
+
