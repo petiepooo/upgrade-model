@@ -21,7 +21,7 @@
 #
 # define a sine wave rainbow color spectrum
 # The max size of a lite DMA transfer is 65536 bytes = 524288 bits; each LED needs 9 bytes (3 colors, 8 bits, 3 values)
-# 1 x 16 x 96 x 9 = 13824 bytes, 4 time slices fit, not more ... need to send time slices per slice to c code ...
+# 1 x 16 x 95 x 9 = 13680 bytes, 4 time slices fit, not more ... need to send time slices per slice to c code ...
 # most available DMA channels are ‘lite’ 16 bit channels (see the BCM2835 ARM Peripherals document)
 # that can only handle a maximum of 64K bytes per transfer, so you might need to use a non-lite channel (0 to 6)
 # without disrupting those that are already (arbitrarily) taken by OS functions. These leaves one with channels 4,5
@@ -72,9 +72,9 @@ parser.add_argument('-d', '--delay_iterations', metavar='\b',
 parser.add_argument('-p', '--pattern', metavar='\b',
                     default='allon',
                     dest='pattern',
-                    help ='select pattern data,datatime, wipe (c), wipe3, rainbowwipe, rainbowtheater, singlewipe (c), rainbow, allon (c), showstring (s,c), instrument (default: allon)')
+                    help ='select pattern data,datatime, wipe (c), wipe3, rainbowwipe, rainbowtheater, singlewipe (c), rainbow, allon (c), showstring (s,c), showdom (s,D,c), instrument (default: allon)')
 parser.add_argument('-c', '--color', metavar='\b',
-                    default=0xff0000,
+                    default='0xff0000',
                     dest='color_string',
                     help ='select colour in hex format (default: 0xff0000 (red))')
 parser.add_argument('-s', '--string', metavar='\b',
@@ -82,6 +82,11 @@ parser.add_argument('-s', '--string', metavar='\b',
                     dest='string_id',
                     type=int,
                     help ='select string number (79-93) (default: 79)')
+parser.add_argument('-D', '--DOM', metavar='\b',
+                    default=79,
+                    dest='DOM_id',
+                    type=int,
+                    help ='select DOM  number (1-95) (default: 1)')
 parser.add_argument('-b', '--brightness', metavar='\b',
                     default=0.5,
                     type=float,
@@ -95,7 +100,7 @@ parser.add_argument('-t', '--type', metavar='\b',
 parsed, unknown = parser.parse_known_args()
 # color is parsed as string; need to convert to integer
 color=0
-if parsed.pattern == 'wipe' or parsed.pattern == 'singlewipe' or parsed.pattern== 'allon' or parsed.pattern == 'showstring':
+if parsed.pattern == 'wipe' or parsed.pattern == 'singlewipe' or parsed.pattern== 'allon' or parsed.pattern == 'showstring' or parsed.pattern == 'showdom':
     color=int(parsed.color_string.replace("0x", ""),16)
 #
 # ============================================================================================
@@ -120,7 +125,7 @@ LEDs        = 95    # maximal numbers of LED's per strip
 #
 # ==================  initialize =============================================================
 wipe=False;wipe3=False;singlewipe=False;rainbowwipe=False;rainbowtheater=False;rainbow=False
-showstring=False;allon=False;instrument=False;data=False;datatime=False
+showstring=False;showdom=False;allon=False;instrument=False;data=False;datatime=False
 slices=95           # default number of time slices
 # ============================================================================================
 #
@@ -132,11 +137,12 @@ elif   parsed.pattern == 'rainbowtheater': rainbowtheater  = True;
 elif   parsed.pattern == 'rainbow':        rainbow         = True; slices=1
 elif   parsed.pattern == 'singlewipe':     singlewipe      = True; slices=LEDs*strings
 elif   parsed.pattern == 'showstring':     showstring      = True; slices=1
+elif   parsed.pattern == 'showdom':        showdom         = True; slices=1
 elif   parsed.pattern == 'allon':          allon           = True; slices=1
 elif   parsed.pattern == 'instrument':     instrument      = True; slices=1
 elif   parsed.pattern == 'datatime':       datatime        = True; slices=360
 elif   parsed.pattern == 'data':           data            = True; slices=1
-else:                                  print("option not available")
+else:                                      print("option not available")
 # ===========================================================================================
 
 # ================== set up array for c program depending on what to display ================
@@ -152,10 +158,11 @@ elif rainbow:        largearray=ldu.Rainbow(largearray,parsed.brightness)
 elif singlewipe:     largearray=ldu.ColorSingleWipe(largearray,color,parsed.brightness)
 elif instrument:     largearray=ldu.Instrument(largearray,parsed.type,parsed.brightness)
 elif showstring:     largearray=ldu.ShowString(largearray,parsed.string_id,color,parsed.brightness)
+elif showdom:        largearray=ldu.ShowDOM(largearray,parsed.DOM_id,parsed.DOM_id,color,parsed.brightness)
 elif allon:          largearray=ldu.AllOn(largearray,color,parsed.brightness)
 elif data or datatime:
     start= 10000    # simulation is given in window; select central part to suppress noise
-    stop = 15000
+    stop = 12000
     #time_index = ldu.time_slice_index(start,stop,testdata)
     #
     # --------   fill large array in predefined time bins with color code -------------------
