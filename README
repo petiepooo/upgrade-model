@@ -1,28 +1,28 @@
-test_string                shell script to run standard Python interface on GPIO18 with hardware PWA
-
-LED_DMA.c                  c program for SMI DMA access, accepts array
+Programs: 
+LED_DMA.py                 python program to run various LED patterns, including data -h gives the options
+LED_DMA.c                  barebone c program that is called by LED_DMA.py to fill direct memory buffer
+LED_DMA                    test shell script to run LED_DMA.py (setting all LEDs to red)
+SLIDE_SHOW                 shell program to run various patterns and data displays
 rpi                        directory that hosts utility program for DMA SMI access
+data                       directory that holds json files with simulated data 
 compile_LED_DMA            shell script to make shared library from test_LED_DMA.c
 
+older programs: 
+test_string                shell script to run standard Python interface on GPIO18 with hardware PWA
 compile_test_ctypes        shell script to make shared library from test_ctypes.c
 test_ctypes.c              c program connected to test_ctypes.py
 test_ctypes.py             python script to test c program access via ctypes 
 test_ctypes                shell script to run test_ctypes.py with python3
 
+The hdmi connection to the screen disturbes the precision of the hardware output to steer the LEDs. Therefore, the video needs to be turned off: 
+In fact, the recommended method to run the rpi headless and start the program via tcp from a remote computer
 
-turning on/off video:
-vcgencmd display_power 0   # off
-vcgencmd display_power 1   # on
 
-or
-
-tvservice --off        or -o
-tvservice --preferred  or -p    (but then screen is empty)
-
-the latter disables the whole display pipeline, inclduing clocks ...
 https://www.elektronik-kompendium.de/sites/raspberry-pi/2111101.htm
 /opt/vc/bin/tvservice -p; sudo /bin/chvt 6; sudo /bin/chvt 7 (gui)
 /opt/vc/bin/tvservice -p; sudo /bin/chvt 2; sudo /bin/chvt 1 (console)
+
+There also a set of software to run  o n e  LED strip using the PWR hardware clock. Here are the instruction to set up this code. You can use test_string to run a test program. 
 
 https://tutorials-raspberrypi.de/raspberry-pi-ws2812-ws2811b-rgb-led-streifen-steuern/
 provides instructions on how to install the rpi_ws281x software:
