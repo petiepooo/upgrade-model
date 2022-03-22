@@ -1,0 +1,1 @@
+sudo python3 ~/rpi_ws281x/python/examples/strandtest.py

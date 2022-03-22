@@ -1,0 +1,2 @@
+gcc -shared -Wl,-soname,LED_DMA.so -o LED_DMA.so -fPIC LED_DMA.c rpi/rpi_dma_utils.c
+
