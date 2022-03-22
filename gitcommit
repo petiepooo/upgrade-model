@@ -1,5 +1,4 @@
 git status
-git add LED_DMA.py
-git add LED_DMA_UTILITY.py
+git add --all
 git commit -am 'update programs'
 git push origin  main
