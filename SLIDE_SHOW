@@ -24,6 +24,6 @@ sleeptime=0.4
      sudo python3 ./LED_DMA.py -p datatime -d $delayevent -n 1 -b $brightness -i "data/NuMu95GeV.json" ; sleep $sleeptime
      sudo python3 ./LED_DMA.py -p datatime -d $delayevent -n 1 -b $brightness -i "data/NuMu94GeV.json" ; sleep $sleeptime
      sudo python3 ./LED_DMA.py -p datatime -d $delayevent -n 1 -b $brightness -i "data/NuMu196GeV.json"; sleep $sleeptime
-     sudo python3 ./LED_DMA.py -p rainbowtheater -n 2 -b $brightness -d $delayevent  ; sleep $sleeptime
+     sudo python3 ./LED_DMA.py -p rainbowwipe -n 2 -b $brightness -d $delay  ; sleep $sleeptime
    #done
 
