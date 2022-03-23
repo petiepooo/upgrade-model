@@ -54,7 +54,7 @@ py_test.argtypes = [ctl.ndpointer(np.uint16,flags='aligned,c_contiguous'),ctypes
 # ================== read parameters from console ===========================================
 working_directory=os.getcwd()                       # get working directory (for default output)
 #
-parser = argparse.ArgumentParser(prog='code_LED_preparation',description='make pattern and send to c-program')
+parser = argparse.ArgumentParser(prog='LED_DMA',description='make patterns and send to c-program')
 parser.add_argument('-i', '--input_filename', metavar='\b',
                     default='data/NuMu101GeV.json',
                     dest='input_filename',

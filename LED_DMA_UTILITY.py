@@ -411,12 +411,12 @@ def Instrument(arr,type,brightness):
     #replace_index(arr,ind,Split24(color))
     # arr: 0=slice, 1=LED, 2=string, 3=color
     # note that order of LEDs and strings is reversed  in setting up
-    print(color,brightness,Split24(color,brightness))
+    #print(color,brightness,Split24(color,brightness))
     #print("result from indexflat",index_flat(arr.shape[2],arr.shape[1],np.array(ind)))
     temparr   = arr.flatten()
     tempindex = index_flat(arr.shape[2],arr.shape[1],np.array(ind))
     tempcolor = Split24(color,brightness)
-    print(ind,tempindex)
+    #print(ind,tempindex)
     np.put(temparr,3*tempindex+0,tempcolor[0])  # check!!
     np.put(temparr,3*tempindex+1,tempcolor[1])  # check!!
     np.put(temparr,3*tempindex+2,tempcolor[2])  # check!!
