@@ -1,5 +1,5 @@
 # need to log into remote repository https://gitlab.rlp.net/koepke/upgrade-model 
-# user: koepke pw: I....1
+# user: koepke pw: I......!
 git status
 git add --all
 git commit -am 'update programs'
