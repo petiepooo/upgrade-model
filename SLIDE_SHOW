@@ -1,12 +1,13 @@
 #!/bin/bash
-brightness=0.5
-delay=100
-delayevent=50
-sleeptime=0.4
-#
-#while true
-   #do
-     #echo "Pres CTRL+C to stop..."
+brightness=0.5  #brightness
+delay=100       #delay in microcseconds between switching to next LED
+delayevent=50   #delay in microcseconds between switching to next LED (alternative)
+sleeptime=0.4   #sleep in seconds after each effect
+period=10       #time to run program in seconds; one can  also try to stop via ctrl c (10h = 36000 s)
+starttime=`date +%s`  #get starttime in s
+echo $starttime
+while [ $(( $(date +%s) - $period )) -lt $starttime ]; do
+     echo "Pres CTRL+C to stop..."
      #sleep 10
      sudo python3 ./LED_DMA.py -p rainbowtheater -n 2 -b $brightness -d $delayevent ; sleep $sleeptime
      sudo python3 ./LED_DMA.py -t DEgg -p instrument -n 2 -b $brightness -d $delay  ; sleep $sleeptime
@@ -25,5 +26,5 @@ sleeptime=0.4
      sudo python3 ./LED_DMA.py -p datatime -d $delayevent -n 1 -b $brightness -i "data/NuMu94GeV.json" ; sleep $sleeptime
      sudo python3 ./LED_DMA.py -p datatime -d $delayevent -n 1 -b $brightness -i "data/NuMu196GeV.json"; sleep $sleeptime
      sudo python3 ./LED_DMA.py -p rainbowwipe -n 2 -b $brightness -d $delay  ; sleep $sleeptime
-   #done
+   done
 

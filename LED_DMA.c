@@ -105,11 +105,8 @@ int LED_DMA(uint16_t* array, int n_iterations, int n_slices, int n_LEDs, int wai
 //----------------------------------------------------------------------------
 {
     //for (int m=0;m<40;m++) {printf("array %i %i \n",m,array[m]);}
-    printf("n_slices= %i\n",n_slices);
-    printf("n_LEDs= %i\n",n_LEDs);
-    printf("n_iterations= %i\n",n_iterations);
-    printf("wait_msec= %i\n",wait_msec);
-    printf("peripheral base address= %x\n",PHYS_REG_BASE);
+    printf("n_slices= %i n_LEDs= %i n_iterations= %i wait_msec= %i\n",n_slices,n_LEDs,n_iterations,wait_msec);
+    //printf("peripheral base address= %x\n",PHYS_REG_BASE);
     //printf("peripheral base address= %i\n",bcm_host_get_peripheral_address());
     signal(SIGINT, terminate);                  //<----- what is this for?
 

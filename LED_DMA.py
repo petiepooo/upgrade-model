@@ -108,7 +108,7 @@ if parsed.pattern == 'wipe' or parsed.pattern == 'singlewipe' or parsed.pattern=
 # ================== loop over files when using simulated data ===============================
 if parsed.pattern == 'data' or parsed.pattern == 'datatime':
    filepathnames = glob.glob(parsed.input_filename)
-   print(parsed.input_filename,filepathnames)
+#   print(parsed.input_filename,filepathnames)
 #   filenames = [os.path.basename(i) for i in glob.glob(parsed.input_filename)] # without directory name
 # ============================================================================================
 

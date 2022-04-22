@@ -109,7 +109,7 @@ def index_flat(rows,columns,indexlist):
     # columns: LEDs
     ind_matrix = np.arange(0, rows*columns).reshape(columns,rows)
     temp_list=np.ndarray.transpose(indexlist,(1,0))[::-1,:].tolist() # reorder LED,string
-    print("templist",temp_list)
+    #print("templist",temp_list)
     return ind_matrix[tuple(temp_list)]                              # produce flat index array
 
 def Split24(input,brightness):
